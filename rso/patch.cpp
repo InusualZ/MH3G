@@ -105,7 +105,7 @@ void* hook_function_internal(void* function, void* destination) {
         return reinterpret_cast<void*>(old_dest);
     }
 
-    u32* trampoline = reinterpret_cast<u32*>(0x80000000);
+    u32* trampoline = reinterpret_cast<u32*>(heap::alloc_mem1(8));
     MOD_ASSERT(trampoline != nullptr);
 
     // Original instruction

@@ -6,3 +6,5 @@
 #define CLAMP(x, min, max) (MIN((max), MAX((min), (x))))
 
 #define EXPORTED extern "C" __attribute__ ((visibility ("default")))
+
+#define FORCEINLINE inline __attribute__((always_inline))

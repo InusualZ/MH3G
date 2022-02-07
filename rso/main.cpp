@@ -24,11 +24,11 @@ struct RSOModule {
     MODULE_FUNCTION unresolved_function;
 };
 
-//static void* (*game_load_rso)(const char*, void*, int) = (void*(*)(const char*, void*, int))0x80040598;
 static void** MODULE_START_PTR = (void**)0x807947b8;
 static void** MODULE_END_PTR = (void**)0x807947bc;
-//static void** hbm_data_module = (void**)0x807947d4;
-//static void* my_module;
+
+void (*net_connect_draw_cb)(void) = (void(*)(void))0x804295cc;
+static void (*draw_trampoline)(void);
 
 namespace main {
 
@@ -40,17 +40,10 @@ void init() {
 
     patch::patch_loader_function();
 
-    // void* next_module_addr = *MODULE_START_PTR;
-    
-    // OSReport("[MH3G] ModuleStartPtr %p\n", next_module_addr);
- 
-    // auto my_module = (RSOModule*)game_load_rso("01/hbm_data.rso", next_module_addr, 0xff);
-
-    // *hbm_data_module = my_module;
-
-    // my_module->prolog_function();
-
-    // *MODULE_END_PTR = (void*)((u32)(*MODULE_START_PTR) + 0x170000);
+    draw_trampoline = patch::hook_function(net_connect_draw_cb, []() {
+        OSReport("[MH3G] Draw CallBack\n");
+        draw_trampoline();
+    });
 
     OSReport("[MH3G] ModuleStartPtr %p | ModuleEndPtr %p\n", *MODULE_START_PTR, *MODULE_END_PTR);
 }
