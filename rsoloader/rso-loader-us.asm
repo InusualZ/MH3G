@@ -12,7 +12,7 @@ sth r5,0(r3) # `00`
 lwz r4,-0x4668(r13) # MOD_MODULE_START_PTR
 li r5,0xff # set 3rd parameter
 # Call `game_load_rso`
-nop # 0x4bb65d91 bl game_load_rso
+.4byte 0x4bb65d91 # bl game_load_rso
 # Call `_prolog` function of the loaded module
 lwz r12,0x24(r3)
 mtspr CTR,r12
