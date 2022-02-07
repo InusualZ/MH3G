@@ -1,0 +1,25 @@
+<wiidisc version="1">
+    <id game="RMH" developer="08" />
+
+    <options>
+        <section name="MH3G Mod">
+            <option name="Load Mod" default="1">
+                <choice name="Enabled">
+                    <patch id="patch-hbm-path" />
+                </choice>
+            </option>
+        </section>
+    </options>
+
+    <!-- 
+        Place mod file as "00/hbm_data.rso" and replace 
+        function that would load the mod.
+    -->
+                
+    <patch id="patch-hbm-path">
+        <file disc="/00/hbm_data.rso" external="MH3G/MH3G.rso" create="true" />
+        <memory offset="0x804da7e4" 
+                    original="3c80aaab800300503884aaab38a000007c0400165400e8ff7c0903a64081002c8083004c8003002c7c842a14808400047c0400404082000c386000004e80002038a5000c"
+                       value="9421FFA07C0802A6900100643C6080583863CA4038A03030B0A30000808DB99838A000FF4bb65d91818300247D8903A64E800421800100647C0803A6382100604E800020" align="4" search="true" />
+    </patch>
+</wiidisc>

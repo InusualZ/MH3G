@@ -1,32 +1,17 @@
-# Prerequisites
-*.d
+.vscode/
+build*
+*.elf
+*.rso
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+__pycache__/
+*.pyc
 
-# Precompiled Headers
-*.gch
-*.pch
+*.vcxproj*
+*.sln
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# CMake
+cmake-build-debug/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+.clangd/
