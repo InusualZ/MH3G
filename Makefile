@@ -12,14 +12,43 @@ include $(DEVKITPPC)/wii_rules
 ifeq ($(REGION),)
 
 all: us
-us:
+us: elf2rso
 	@$(MAKE) --no-print-directory REGION=us GAMECODE=RMHE08
 
-clean:
+clean: clean_elf2rso
 	@$(MAKE) --no-print-directory clean_target REGION=us GAMECODE=RMHE08
 
 
-.PHONY: all clean us
+
+#---------------------------------------------------------------------------------
+# For now, make elf2rso a phony target
+# Place target here (instead of inside recursive Makefile call) so it's only built once
+#---------------------------------------------------------------------------------
+
+# Unexport some compiler vars exported by devkitppc as they interfere
+# when we build elf2rso, which uses the system compiler
+unexport AS
+unexport CC
+unexport CXX
+unexport AR
+unexport OBJCOPY
+unexport STRIP
+unexport NM
+unexport RANLIB
+
+ELF2RSO_BUILD := $(CURDIR)/tools/elf2rso/build
+
+elf2rso:
+	@echo "Compiling elf2rso..."
+	mkdir -p $(ELF2RSO_BUILD)
+	cd $(ELF2RSO_BUILD) && cmake ..
+	$(MAKE) -C $(ELF2RSO_BUILD) -f $(ELF2RSO_BUILD)/Makefile
+
+clean_elf2rso:
+	@echo "clean ... elf2rso"
+	@rm -rf $(ELF2RSO_BUILD)
+
+.PHONY: all clean us elf2rso clean_elf2rso
 
 else
 
@@ -145,7 +174,8 @@ else
 
 DEPENDS	:=	$(OFILES:.o=.d)
 
-ELF2RSO := 
+TOOLS := $(abspath $(CURDIR)/../tools)
+ELF2RSO := $(TOOLS)/elf2rso/build/elf2rso
 
 #---------------------------------------------------------------------------------
 # main targets
@@ -158,8 +188,8 @@ $(OFILES_SOURCES) : $(HFILES)
 # RSO linking
 %.rso: %.elf
 	@echo output ... $(notdir $@)
-#	@$(ELF2RSO) $<
-#	@cp $@ $(CURDIR)/../riivolution/MH3G/MH3G.rso
+	@$(ELF2RSO) -i $<
+	@cp $@ $(CURDIR)/../riivolution/MH3G/MH3G.rso
 
 -include $(DEPENDS)
 
