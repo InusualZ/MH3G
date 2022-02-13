@@ -188,7 +188,7 @@ $(OFILES_SOURCES) : $(HFILES)
 # RSO linking
 %.rso: %.elf
 	@echo output ... $(notdir $@)
-	@$(ELF2RSO) -i $<
+	@$(ELF2RSO) -i $< -ne
 	@cp $@ $(CURDIR)/../riivolution/MH3G/MH3G.rso
 
 -include $(DEPENDS)
