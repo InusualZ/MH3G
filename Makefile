@@ -9,48 +9,25 @@ endif
 
 include $(DEVKITPPC)/wii_rules
 
-ifeq ($(REGION),)
+ifeq ($(strip $(REGION)),)
+    REGION := us
+    GAMECODE := RMHE08
+    PRINTVER := "US"
+else ifeq ($(strip $(REGION)),us)
+    GAMECODE := RMHE08
+    PRINTVER := "US"
+else ifeq ($(strip $(REGION)),jp)
+    GAMECODE := RMHJ08
+    PRINTVER := "JP"
+else ifeq ($(strip $(REGION)),pal)
+    GAMECODE := RMHP08
+    PRINTVER := "PAL"
+else 
+    REGION := us
+    GAMECODE := RMHE08
+    PRINTVER := "US"
+endif
 
-all: us
-us: elf2rso
-	@$(MAKE) --no-print-directory REGION=us GAMECODE=RMHE08
-
-clean: clean_elf2rso
-	@$(MAKE) --no-print-directory clean_target REGION=us GAMECODE=RMHE08
-
-
-
-#---------------------------------------------------------------------------------
-# For now, make elf2rso a phony target
-# Place target here (instead of inside recursive Makefile call) so it's only built once
-#---------------------------------------------------------------------------------
-
-# Unexport some compiler vars exported by devkitppc as they interfere
-# when we build elf2rso, which uses the system compiler
-unexport AS
-unexport CC
-unexport CXX
-unexport AR
-unexport OBJCOPY
-unexport STRIP
-unexport NM
-unexport RANLIB
-
-ELF2RSO_BUILD := $(CURDIR)/tools/elf2rso/build
-
-elf2rso:
-	@echo "Compiling elf2rso..."
-	mkdir -p $(ELF2RSO_BUILD)
-	cd $(ELF2RSO_BUILD) && cmake ..
-	$(MAKE) -C $(ELF2RSO_BUILD) -f $(ELF2RSO_BUILD)/Makefile
-
-clean_elf2rso:
-	@echo "clean ... elf2rso"
-	@rm -rf $(ELF2RSO_BUILD)
-
-.PHONY: all clean us elf2rso clean_elf2rso
-
-else
 
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
@@ -76,18 +53,7 @@ MACHDEP		= -mno-sdata -mgcn -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float
 CFLAGS		= -nostdlib -ffreestanding -ffunction-sections -fdata-sections -g -Os -Wall -Wno-write-strings -fmacro-prefix-map=$(abspath $(CURDIR)/../rso)=. $(MACHDEP) $(INCLUDE)
 CXXFLAGS	= -fno-exceptions -fno-rtti -std=gnu++20 $(CFLAGS)
 ASFLAGS     = -mregnames # Don't require % in front of register names
-
 LDFLAGS		= -r -e _prolog -u _prolog -u _epilog -u _unresolved -Wl,--gc-sections -nostdlib -g $(MACHDEP) #-Wl,-Map,$(notdir $@).map
-
-# Platform options
-ifeq ($(GAMECODE),RMHE08)
-	PRINTVER = "US"
-else ifeq ($(GAMECODE),RMHJ08)
-	PRINTVER = "JAP"
-else ifeq ($(GAMECODE),RMHP08)
-	PRINTVER = "PAL"
-endif
-
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
@@ -127,9 +93,9 @@ BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 # use CXX for linking C++ projects, CC for standard C
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(CPPFILES)),)
-	export LD	:=	$(CC)
+    export LD := $(CC)
 else
-	export LD	:=	$(CXX)
+    export LD := $(CXX)
 endif
 
 export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES))
@@ -140,7 +106,6 @@ export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 # For RSO linking
 export LDFILES		:= $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.ld)))
-#export MAPFILE		:= $(CURDIR)/rel/include/mkb2.$(REGION).lst
 
 #---------------------------------------------------------------------------------
 # build a list of include paths
@@ -157,7 +122,8 @@ export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
 			-L$(LIBOGC_LIB)
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
-.PHONY: $(BUILD) clean_target
+
+.PHONY: $(BUILD) clean
 
 #---------------------------------------------------------------------------------
 $(BUILD):
@@ -165,9 +131,9 @@ $(BUILD):
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
-clean_target:
+clean:
 	@echo clean ... $(GAMECODE)
-	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol $(OUTPUT).rel $(OUTPUT).gci
+	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol $(OUTPUT).rso $(OUTPUT).gci
 
 #---------------------------------------------------------------------------------
 else
@@ -175,7 +141,14 @@ else
 DEPENDS	:=	$(OFILES:.o=.d)
 
 TOOLS := $(abspath $(CURDIR)/../tools)
-ELF2RSO := $(TOOLS)/elf2rso/build/elf2rso
+
+ifeq ($(OS),Windows_NT)
+    ELF2RSO := $(TOOLS)/elf2rso.exe
+    ELF_PATH := $(shell cygpath -a -w "$(OUTPUT).elf")
+else
+    ELF2RSO := $(TOOLS)/elf2rso
+    ELF_PATH := $(OUTPUT).elf
+endif
 
 #---------------------------------------------------------------------------------
 # main targets
@@ -188,12 +161,10 @@ $(OFILES_SOURCES) : $(HFILES)
 # RSO linking
 %.rso: %.elf
 	@echo output ... $(notdir $@)
-	@$(ELF2RSO) -i $< -ne
+	@$(ELF2RSO) -i "$(ELF_PATH)" -ne
 	@cp $@ $(CURDIR)/../riivolution/MH3G/MH3G.rso
 
 -include $(DEPENDS)
 
-#---------------------------------------------------------------------------------
-endif
 #---------------------------------------------------------------------------------
 endif

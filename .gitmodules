@@ -1,3 +1,0 @@
-[submodule "tools/elf2rso"]
-	path = tools/elf2rso
-	url = https://github.com/InusualZ/elf2rso.git
