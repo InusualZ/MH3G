@@ -10,3 +10,6 @@ EXPORTED char* strcpy(char* destination, const char* source);
 EXPORTED size_t strlen (const char* str);
 EXPORTED char* strstr(char* str1, const char* str2);
 EXPORTED char* strupr(char* str1);
+
+EXPORTED int sprintf(char * buffer, char * format, ...);
+// EXPORTED int vsnprintf (char * s, size_t n, const char * format, va_list arg);

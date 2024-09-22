@@ -1,6 +1,6 @@
 #include "patch.h"
 #include "heap.h"
-#include "log.h"
+#include "assert.h"
 #include "revolution/stdio.h"
 
 void (*DCFlushRange)(void* addr, u32 nBytes) = (void (*)(void*, u32))0x804cc610;

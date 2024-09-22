@@ -1,8 +1,8 @@
-#include "log.h"
+#include "assert.h"
 
 #include "revolution\os.h"
 
-namespace log {
+namespace assert {
 
 void mod_assert(const char* file, s32 line, bool exp) {
     if (!(exp)) {
