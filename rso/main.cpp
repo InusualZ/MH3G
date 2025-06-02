@@ -25,18 +25,10 @@ struct RSOModule {
     MODULE_FUNCTION unresolved_function;
 };
 
-// static void** MODULE_START_PTR = (void**)0x807947b8;
-// static void** MODULE_END_PTR = (void**)0x807947bc;
-
-// void (*net_connect_draw_cb)(void) = (void(*)(void))0x804295cc;
-// static void (*draw_trampoline)(void);
-
 namespace main {
 
 void init() {
-
     patch::patch_loader_function();
-
     version::init();
     gpatch::init();
 }
