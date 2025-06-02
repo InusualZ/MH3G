@@ -24,11 +24,13 @@ namespace gpatch {
                 // _PLW array is alway at pos 2
                 auto amountPLW = moveWork->move_work_max[2];
                 auto plwArray = (_PLW*)moveWork->move_work[2];
-                auto yPos = 128;
+                auto yPos = 116;
                 for (auto idx = 0; idx < amountPLW; ++idx) {
                     auto plw = plwArray[idx];
                     font_set_size__Fss(18, 18);
                     font_print_ex__FsssPSce(64, yPos + (idx * 20), 0, "POS[%d] %.2f %.2f %.2f", idx, plw.XPos, plw.YPos, plw.ZPos);
+                    font_print_ex__FsssPSce(64, yPos + (idx + 1 * 20), 0, "ROT[%d] %d %d %d", idx, plw.rotX, plw.rotY, plw.rotZ);
+                    font_print_ex__FsssPSce(64, yPos + (idx + 2 * 20), 0, "Area[%d] %d %d", idx, plw.area, plw.area2);
                 }
             }
             zz_02ece28_draw_trampoline(plw, unk1);
